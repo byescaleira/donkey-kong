@@ -10,6 +10,11 @@ the girders. Grab the overclock chip to smash them. Reach the power core before 
 Characters, art and theme are original and authored in this repository as pixel grids in code —
 there are no third-party assets and no ROM is required.
 
+> **Not affiliated with Nintendo.** This project is not associated with, authorised or endorsed by
+> Nintendo. It contains no Nintendo code, assets, characters or trademarks: the game, its
+> characters and its artwork are original work. The repository directory is named after the arcade
+> genre that inspired it; the game itself is called Scrap Spire.
+
 ## Running it
 
 ```bash
