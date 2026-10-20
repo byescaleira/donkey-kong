@@ -1,0 +1,390 @@
+{
+  "fill-specializations": [
+    {
+      "value": {
+        "linear-gradient": [
+          "display-p3:0.11373,0.12549,0.20392,1.00000",
+          "display-p3:0.01961,0.02353,0.04706,1.00000"
+        ]
+      }
+    },
+    {
+      "appearance": "dark",
+      "value": {
+        "linear-gradient": [
+          "display-p3:0.08235,0.09020,0.14902,1.00000",
+          "display-p3:0.01176,0.01569,0.03137,1.00000"
+        ]
+      }
+    }
+  ],
+  "groups": [
+    {
+      "layers": [
+        {
+          "fill-specializations": [
+            {
+              "value": {
+                "solid": "srgb:0.43137,0.85098,0.94118,1.00000"
+              }
+            },
+            {
+              "appearance": "dark",
+              "value": {
+                "solid": "srgb:0.43137,0.85098,0.94118,1.00000"
+              }
+            }
+          ],
+          "image-name": "Scanlines.svg",
+          "name": "Scanlines",
+          "opacity": 0.05,
+          "position": {
+            "scale": 1.0,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "fill-specializations": [
+            {
+              "value": {
+                "solid": "srgb:0.65882,0.70588,0.75294,1.00000"
+              }
+            },
+            {
+              "appearance": "dark",
+              "value": {
+                "solid": "srgb:0.65882,0.70588,0.75294,1.00000"
+              }
+            }
+          ],
+          "image-name": "Scaffold.svg",
+          "name": "Scaffold",
+          "opacity": 0.16,
+          "position": {
+            "scale": 1.0,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.0
+      },
+      "translucency": {
+        "enabled": false,
+        "value": 0.5
+      }
+    },
+    {
+      "layers": [
+        {
+          "fill-specializations": [
+            {
+              "value": {
+                "solid": "srgb:0.90980,0.36078,0.22745,1.00000"
+              }
+            },
+            {
+              "appearance": "dark",
+              "value": {
+                "solid": "srgb:0.90980,0.36078,0.22745,1.00000"
+              }
+            }
+          ],
+          "image-name": "Girders.svg",
+          "name": "Girders",
+          "opacity": 1.0,
+          "position": {
+            "scale": 1.0,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "fill-specializations": [
+            {
+              "value": {
+                "solid": "srgb:0.43137,0.85098,0.94118,1.00000"
+              }
+            },
+            {
+              "appearance": "dark",
+              "value": {
+                "solid": "srgb:0.43137,0.85098,0.94118,1.00000"
+              }
+            }
+          ],
+          "image-name": "Ladder.svg",
+          "name": "Ladder",
+          "opacity": 0.85,
+          "position": {
+            "scale": 1.0,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.45
+      },
+      "translucency": {
+        "enabled": false,
+        "value": 0.5
+      }
+    },
+    {
+      "layers": [
+        {
+          "fill-specializations": [
+            {
+              "value": {
+                "solid": "srgb:0.07843,0.09412,0.14902,1.00000"
+              }
+            },
+            {
+              "appearance": "dark",
+              "value": {
+                "solid": "srgb:0.07843,0.09412,0.14902,1.00000"
+              }
+            }
+          ],
+          "image-name": "PipOutline.svg",
+          "name": "PipOutline",
+          "opacity": 1.0,
+          "position": {
+            "scale": 1.0,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "fill-specializations": [
+            {
+              "value": {
+                "solid": "srgb:0.24706,0.78824,0.74510,1.00000"
+              }
+            },
+            {
+              "appearance": "dark",
+              "value": {
+                "solid": "srgb:0.24706,0.78824,0.74510,1.00000"
+              }
+            }
+          ],
+          "image-name": "PipShell.svg",
+          "name": "PipShell",
+          "opacity": 1.0,
+          "position": {
+            "scale": 1.0,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "fill-specializations": [
+            {
+              "value": {
+                "solid": "srgb:1.00000,0.70196,0.23529,1.00000"
+              }
+            },
+            {
+              "appearance": "dark",
+              "value": {
+                "solid": "srgb:1.00000,0.70196,0.23529,1.00000"
+              }
+            }
+          ],
+          "image-name": "PipVisor.svg",
+          "name": "PipVisor",
+          "opacity": 1.0,
+          "position": {
+            "scale": 1.0,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "fill-specializations": [
+            {
+              "value": {
+                "solid": "srgb:0.65882,0.70588,0.75294,1.00000"
+              }
+            },
+            {
+              "appearance": "dark",
+              "value": {
+                "solid": "srgb:0.65882,0.70588,0.75294,1.00000"
+              }
+            }
+          ],
+          "image-name": "PipMetal.svg",
+          "name": "PipMetal",
+          "opacity": 1.0,
+          "position": {
+            "scale": 1.0,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "fill-specializations": [
+            {
+              "value": {
+                "solid": "srgb:1.00000,0.41569,0.23529,1.00000"
+              }
+            },
+            {
+              "appearance": "dark",
+              "value": {
+                "solid": "srgb:1.00000,0.41569,0.23529,1.00000"
+              }
+            }
+          ],
+          "image-name": "PipAccent.svg",
+          "name": "PipAccent",
+          "opacity": 1.0,
+          "position": {
+            "scale": 1.0,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "fill-specializations": [
+            {
+              "value": {
+                "solid": "srgb:1.00000,1.00000,0.95686,1.00000"
+              }
+            },
+            {
+              "appearance": "dark",
+              "value": {
+                "solid": "srgb:1.00000,1.00000,0.95686,1.00000"
+              }
+            }
+          ],
+          "image-name": "PipGlint.svg",
+          "name": "PipGlint",
+          "opacity": 1.0,
+          "position": {
+            "scale": 1.0,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "fill-specializations": [
+            {
+              "value": {
+                "solid": "srgb:0.07843,0.09412,0.14902,1.00000"
+              }
+            },
+            {
+              "appearance": "dark",
+              "value": {
+                "solid": "srgb:0.07843,0.09412,0.14902,1.00000"
+              }
+            }
+          ],
+          "image-name": "CanOutline.svg",
+          "name": "CanOutline",
+          "opacity": 1.0,
+          "position": {
+            "scale": 1.0,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "fill-specializations": [
+            {
+              "value": {
+                "solid": "srgb:0.76078,0.30588,0.19608,1.00000"
+              }
+            },
+            {
+              "appearance": "dark",
+              "value": {
+                "solid": "srgb:0.76078,0.30588,0.19608,1.00000"
+              }
+            }
+          ],
+          "image-name": "CanDrum.svg",
+          "name": "CanDrum",
+          "opacity": 1.0,
+          "position": {
+            "scale": 1.0,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
+        },
+        {
+          "fill-specializations": [
+            {
+              "value": {
+                "solid": "srgb:1.00000,0.87843,0.29020,1.00000"
+              }
+            },
+            {
+              "appearance": "dark",
+              "value": {
+                "solid": "srgb:1.00000,0.87843,0.29020,1.00000"
+              }
+            }
+          ],
+          "image-name": "CanBand.svg",
+          "name": "CanBand",
+          "opacity": 1.0,
+          "position": {
+            "scale": 1.0,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.5
+      },
+      "translucency": {
+        "enabled": false,
+        "value": 0.5
+      }
+    }
+  ],
+  "supported-platforms": {
+    "circles": [
+      "watchOS"
+    ],
+    "squares": "shared"
+  }
+}

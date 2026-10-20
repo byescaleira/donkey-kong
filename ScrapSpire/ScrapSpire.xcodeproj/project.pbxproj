@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		50BFFAE8D89206230F57CCE5 /* ScrapSpireIcon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 6A3B299C818A8F129184C1E6 /* ScrapSpireIcon.icon */; };
 		5CFC5F634C398381861E6091 /* ScrapSpireApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC8DD3FFAA0C4081CA54CCCE /* ScrapSpireApp.swift */; };
 		CC00075920FC1F23171B7E6F /* ArcadeKit in Frameworks */ = {isa = PBXBuildFile; productRef = D6B1AA63C643FFDDCE1E2C44 /* ArcadeKit */; };
 /* End PBXBuildFile section */
@@ -14,6 +15,7 @@
 /* Begin PBXFileReference section */
 		620F95E615A86A6CAD1787EA /* ArcadeKit */ = {isa = PBXFileReference; lastKnownFileType = folder; name = ArcadeKit; path = ../ArcadeKit; sourceTree = SOURCE_ROOT; };
 		69F3F1A6AC079584012C544C /* ScrapSpire.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = ScrapSpire.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		6A3B299C818A8F129184C1E6 /* ScrapSpireIcon.icon */ = {isa = PBXFileReference; lastKnownFileType = wrapper.icon; path = ScrapSpireIcon.icon; sourceTree = "<group>"; };
 		EC8DD3FFAA0C4081CA54CCCE /* ScrapSpireApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrapSpireApp.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -49,6 +51,7 @@
 			isa = PBXGroup;
 			children = (
 				EC8DD3FFAA0C4081CA54CCCE /* ScrapSpireApp.swift */,
+				6A3B299C818A8F129184C1E6 /* ScrapSpireIcon.icon */,
 			);
 			path = ScrapSpire;
 			sourceTree = "<group>";
@@ -70,6 +73,7 @@
 			buildConfigurationList = 3521D508506D7A19A3706903 /* Build configuration list for PBXNativeTarget "ScrapSpire" */;
 			buildPhases = (
 				71DD242A4D32F0DB8AAAE192 /* Sources */,
+				A6A65E68D1DE12DDAF7F1BAD /* Resources */,
 				E543915D85B9E00E17FF0D85 /* Frameworks */,
 			);
 			buildRules = (
@@ -93,6 +97,9 @@
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1430;
 				TargetAttributes = {
+					A4485AC60EA90D5DA2AD1DF7 = {
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = D36733CA1F1D41F9BDB7D6E1 /* Build configuration list for PBXProject "ScrapSpire" */;
@@ -117,6 +124,17 @@
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		A6A65E68D1DE12DDAF7F1BAD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				50BFFAE8D89206230F57CCE5 /* ScrapSpireIcon.icon in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		71DD242A4D32F0DB8AAAE192 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -132,7 +150,7 @@
 		04FAF1AF013B890C11249E8F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = ScrapSpireIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
@@ -193,8 +211,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
@@ -237,7 +254,7 @@
 		31BC2B53609E337BF787637F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_APPICON_NAME = ScrapSpireIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_PREVIEWS = YES;
@@ -298,8 +315,7 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGNING_ALLOWED = NO;
-				CODE_SIGNING_REQUIRED = NO;
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
