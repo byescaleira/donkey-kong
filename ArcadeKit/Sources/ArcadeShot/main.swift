@@ -42,6 +42,12 @@ struct ArcadeShot {
                 spire.sync(world: world)
             }
 
+            if arguments.frames > 1 {
+                try probe(
+                    grabber: grabber, scene: scene, arguments: arguments, world: world)
+                return
+            }
+
             let settings = RenderSettings(
                 upscaling: arguments.upscaling, crt: arguments.crt,
                 maxOutputHeight: arguments.maxHeight)
@@ -63,6 +69,36 @@ struct ArcadeShot {
             exit(1)
         }
     }
+}
+
+@MainActor
+private func probe(
+    grabber: FrameGrabber, scene: SKScene, arguments: Arguments, world: GameWorld
+) throws {
+    let settings = RenderSettings(
+        upscaling: arguments.upscaling, crt: arguments.crt, maxOutputHeight: arguments.maxHeight)
+    var digests: [String] = []
+    for frame in 0..<arguments.frames {
+        let time = arguments.seconds + Double(frame) * GameClock.tickDuration * 12
+        let result = try grabber.grab(
+            scene: scene, time: time, size: arguments.size, settings: settings)
+        digests.append(digest(result.image))
+    }
+    let unique = Set(digests).count
+    print("probed \(arguments.frames) frames with a frozen world")
+    print("  distinct \(unique)")
+    print("  verdict  \(unique > 1 ? "SKActions advance" : "SKActions FROZEN")")
+}
+
+@MainActor
+private func digest(_ image: CGImage) -> String {
+    guard let data = image.dataProvider?.data as Data? else { return "none" }
+    var hash: UInt64 = 1_469_598_103_934_665_603
+    for byte in data {
+        hash ^= UInt64(byte)
+        hash = hash &* 1_099_511_628_211
+    }
+    return String(hash, radix: 16)
 }
 
 @MainActor
@@ -97,6 +133,7 @@ private struct Arguments {
     var output = URL(fileURLWithPath: "frame.png")
     var input = InputState(horizontal: 1)
     var selfTest = false
+    var frames = 1
 
     init(_ arguments: [String]) {
         var index = 1
@@ -126,6 +163,9 @@ private struct Arguments {
             case "--no-crt":
                 crt = .off
                 index += 1
+            case "--frames":
+                frames = Int(value) ?? frames
+                index += 2
             case "--selftest":
                 selfTest = true
                 index += 1

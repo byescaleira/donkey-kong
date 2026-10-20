@@ -5,6 +5,7 @@ options:
   deploymentTarget:
     iOS: "26.0"
     macOS: "26.0"
+    tvOS: "26.0"
   minimumXcodeGenVersion: "2.40.0"
 
 packages:
@@ -27,7 +28,7 @@ settings:
 targets:
   ScrapSpire:
     type: application
-    supportedDestinations: [iOS, macOS]
+    supportedDestinations: [iOS, macOS, tvOS]
     sources:
       - path: ScrapSpire
     dependencies:
@@ -43,9 +44,9 @@ targets:
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UIStatusBarHidden: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        INFOPLIST_KEY_GCSupportsControllerUserInteraction: YES
         INFOPLIST_KEY_NSHumanReadableCopyright: ""
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.arcade-games
-        TARGETED_DEVICE_FAMILY: "1,2"
         ENABLE_PREVIEWS: YES
         METAL_FAST_MATH: YES
 

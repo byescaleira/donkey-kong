@@ -43,6 +43,34 @@ framework nenhum. É por isso que a suíte roda em milissegundos e que a simula�
 O input é coletado num `InputBuffer` e consumido **uma vez por frame**. Quando um frame gera vários
 passos, o pulo e o start valem só no primeiro, senão um frame longo viraria pulo duplo.
 
+## tvOS
+
+O Apple TV é o alvo principal. O que muda:
+
+- **Entrada.** `GamepadInput` (ArcadeUI) faz *polling* de `GCController` a cada frame e alimenta o
+  mesmo `InputBuffer` do teclado e do stick na tela. A decisão fica em `GamepadMapping`
+  (ArcadeCore), puro e testado: zona morta, clamp de stick + d-pad somados, e **uma** borda de pulo
+  por pressionada. Sem isso, segurar o botão viraria pulo a 60 Hz.
+- **Qualquer botão inicia.** A borda de pulo também emite `start`, então não é preciso ter um botão
+  focado para começar — o que importa porque o motor de foco do tvOS é a única forma de "clicar".
+- **Foco versus jogo.** Um controle focável no tvOS captura o d-pad do Siri Remote. Por isso o botão
+  de ajustes some enquanto `phase.isInteractive`, deixando o remote inteiro para o jogo.
+- **`Slider` não existe no tvOS.** Os controles de CRT caem num `Picker` de quatro passos, navegável
+  por foco. `DragGesture` também não existe, então `TouchControlsView` inteiro está sob `#if os(iOS)`
+  — não basta não usá-lo, o arquivo precisa não compilar.
+- **Overscan.** É só safe area: o tvOS reporta as margens por `safeAreaInsets`, que a
+  `VirtualViewport` já usa para encaixar a área de jogo. Nada de constante mágica de overscan.
+
+O simulador de tvOS não traz MetalFX (o SDK do device traz), então lá o jogo exercita o caminho de
+resolução nativa.
+
+### Diagnóstico de frame
+
+`GameRenderer` imprime, em `DEBUG`, a cada 120 frames: contagem, drawables perdidos, tamanho do
+drawable, bounds e fps alvo. Foi o que resolveu a dúvida de o `simctl io screenshot` do tvOS
+devolver sempre a mesma imagem: o log mostrou `frames=720 missingDrawable=0 drawableSize=3840x2160`,
+provando que o jogo apresentava 60 fps em 4K e que a captura é que estava em cache.
+
 ## Decisões
 
 - **`SKRenderer` em vez de `SKView`.** É o único jeito de colocar SpriteKit dentro de um pipeline

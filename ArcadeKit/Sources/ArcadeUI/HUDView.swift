@@ -5,6 +5,14 @@ struct HUDView: View {
     @Environment(GameSession.self) private var session
     let onSettings: () -> Void
 
+    private var showsSettingsButton: Bool {
+        #if os(tvOS)
+            !session.phase.isInteractive
+        #else
+            true
+        #endif
+    }
+
     var body: some View {
         VStack(spacing: 0) {
             HStack(alignment: .top) {
@@ -18,7 +26,9 @@ struct HUDView: View {
             HStack(spacing: 12) {
                 BonusBar(fraction: session.world.bonusFraction)
                     .allowsHitTesting(false)
-                SettingsButton(action: onSettings)
+                if showsSettingsButton {
+                    SettingsButton(action: onSettings)
+                }
             }
             .padding(.top, 8)
             Spacer()
@@ -31,8 +41,8 @@ struct HUDView: View {
             }
             .allowsHitTesting(false)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.horizontal, HUDMetrics.margin)
+        .padding(.vertical, HUDMetrics.size(12))
     }
 }
 
@@ -42,8 +52,8 @@ private struct SettingsButton: View {
     var body: some View {
         Button(action: action) {
             Image(systemName: "slider.horizontal.3")
-                .font(.system(size: 14, weight: .semibold))
-                .frame(width: 30, height: 30)
+                .font(.system(size: HUDMetrics.size(14), weight: .semibold))
+                .frame(width: HUDMetrics.size(30), height: HUDMetrics.size(30))
                 .background(.white.opacity(0.1), in: .circle)
         }
         .buttonStyle(.plain)
@@ -60,10 +70,10 @@ private struct ScoreColumn: View {
     var body: some View {
         VStack(alignment: alignment, spacing: 2) {
             Text(title)
-                .font(.system(size: 10, weight: .bold, design: .monospaced))
+                .font(.system(size: HUDMetrics.size(10), weight: .bold, design: .monospaced))
                 .foregroundStyle(.secondary)
             Text(value, format: .number.grouping(.never))
-                .font(.system(size: 22, weight: .heavy, design: .monospaced))
+                .font(.system(size: HUDMetrics.size(22), weight: .heavy, design: .monospaced))
                 .foregroundStyle(.white)
                 .contentTransition(.numericText())
                 .monospacedDigit()
@@ -77,10 +87,10 @@ private struct StageBadge: View {
     var body: some View {
         VStack(spacing: 2) {
             Text("SPIRE")
-                .font(.system(size: 10, weight: .bold, design: .monospaced))
+                .font(.system(size: HUDMetrics.size(10), weight: .bold, design: .monospaced))
                 .foregroundStyle(.secondary)
             Text("\(stage)")
-                .font(.system(size: 18, weight: .heavy, design: .monospaced))
+                .font(.system(size: HUDMetrics.size(18), weight: .heavy, design: .monospaced))
                 .foregroundStyle(ArcadePalette.visor.color)
         }
         .padding(.horizontal, 10)
@@ -102,7 +112,7 @@ private struct BonusBar: View {
                     .frame(width: max(proxy.size.width * fraction, 0))
             }
         }
-        .frame(height: 5)
+        .frame(height: HUDMetrics.size(5))
         .animation(.linear(duration: 0.1), value: fraction)
     }
 
@@ -121,7 +131,7 @@ private struct LivesRow: View {
             ForEach(0..<max(lives, 0), id: \.self) { _ in
                 Circle()
                     .fill(ArcadePalette.shell.color)
-                    .frame(width: 9, height: 9)
+                    .frame(width: HUDMetrics.size(9), height: HUDMetrics.size(9))
                     .overlay(Circle().stroke(.black.opacity(0.5), lineWidth: 1))
             }
         }
@@ -131,7 +141,7 @@ private struct LivesRow: View {
 private struct OverclockTag: View {
     var body: some View {
         Text("OVERCLOCK")
-            .font(.system(size: 10, weight: .heavy, design: .monospaced))
+            .font(.system(size: HUDMetrics.size(10), weight: .heavy, design: .monospaced))
             .foregroundStyle(.black)
             .padding(.horizontal, 8)
             .padding(.vertical, 3)

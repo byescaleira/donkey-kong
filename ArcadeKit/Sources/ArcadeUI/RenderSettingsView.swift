@@ -46,16 +46,15 @@ public struct RenderSettingsView: View {
                 Section("Cabinet look") {
                     Toggle("CRT effects", isOn: $session.settings.crt.isEnabled)
                     if session.settings.crt.isEnabled {
-                        Slider(value: $session.settings.crt.scanlineStrength, in: 0...0.6) {
-                            Text("Scanlines")
-                        }
-                        Slider(value: $session.settings.crt.bloom, in: 0...1) { Text("Bloom") }
-                        Slider(value: $session.settings.crt.curvature, in: 0...0.06) {
-                            Text("Curvature")
-                        }
-                        Slider(value: $session.settings.crt.vignette, in: 0...0.6) {
-                            Text("Vignette")
-                        }
+                        EffectLevel(
+                            title: "Scanlines", value: $session.settings.crt.scanlineStrength,
+                            range: 0...0.6)
+                        EffectLevel(title: "Bloom", value: $session.settings.crt.bloom, range: 0...1)
+                        EffectLevel(
+                            title: "Curvature", value: $session.settings.crt.curvature,
+                            range: 0...0.06)
+                        EffectLevel(
+                            title: "Vignette", value: $session.settings.crt.vignette, range: 0...0.6)
                     }
                 }
             }
@@ -66,5 +65,38 @@ public struct RenderSettingsView: View {
                 }
             }
         }
+    }
+}
+
+private struct EffectLevel: View {
+    let title: String
+    @Binding var value: Double
+    let range: ClosedRange<Double>
+
+    var body: some View {
+        #if os(tvOS)
+            Picker(title, selection: step) {
+                Text("Off").tag(0)
+                Text("Low").tag(1)
+                Text("Medium").tag(2)
+                Text("High").tag(3)
+            }
+        #else
+            Slider(value: $value, in: range) { Text(title) }
+        #endif
+    }
+
+    private var step: Binding<Int> {
+        Binding(
+            get: {
+                let span = range.upperBound - range.lowerBound
+                guard span > 0 else { return 0 }
+                let fraction = (value - range.lowerBound) / span
+                return Int((fraction * 3).rounded().clamped(to: 0...3))
+            },
+            set: { newValue in
+                let span = range.upperBound - range.lowerBound
+                value = range.lowerBound + span * Double(newValue) / 3
+            })
     }
 }

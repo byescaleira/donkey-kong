@@ -4,7 +4,7 @@ import PackageDescription
 let package = Package(
     name: "ArcadeKit",
     defaultLocalization: "en",
-    platforms: [.iOS("26.0"), .macOS("26.0")],
+    platforms: [.iOS("26.0"), .macOS("26.0"), .tvOS("26.0")],
     products: [
         .library(name: "ArcadeKit", targets: ["ArcadeUI"]),
         .library(name: "ArcadeCore", targets: ["ArcadeCore"]),

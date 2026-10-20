@@ -25,6 +25,7 @@ public final class GameSession {
     public var isPaused = false
 
     @ObservationIgnored public let input = InputBuffer()
+    @ObservationIgnored private let gamepad = GamepadInput()
     @ObservationIgnored private let spireScene: SpireScene
     @ObservationIgnored private var clock = GameClock()
     @ObservationIgnored private var frameTimes: [Double] = []
@@ -35,6 +36,8 @@ public final class GameSession {
         self.settings = settings
         spireScene = SpireScene(size: VirtualViewport.coreSize.cgSize)
     }
+
+    public var controllerName: String? { gamepad.controllerName }
 
     public var highScore: Int { world.board.highScore }
     public var board: ScoreBoard { world.board }
@@ -91,6 +94,8 @@ extension GameSession: FrameDriver {
             spireScene.sync(world: world)
             return
         }
+
+        gamepad.poll(into: input)
 
         let steps = clock.advance(to: time)
         if steps > 0 {

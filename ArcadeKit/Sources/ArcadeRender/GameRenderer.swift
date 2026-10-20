@@ -21,6 +21,8 @@ public final class GameRenderer: NSObject {
     private let composer: FrameComposer
     private weak var driver: (any FrameDriver)?
     private var startTime: CFTimeInterval?
+    private var frameCount = 0
+    private var missingDrawables = 0
 
     public init(context: MetalContext, driver: any FrameDriver) {
         self.context = context
@@ -43,10 +45,14 @@ public final class GameRenderer: NSObject {
     }
 
     fileprivate func renderFrame(in view: MTKView) {
-        guard let driver,
-            let drawable = view.currentDrawable,
+        guard let driver else { return }
+        guard let drawable = view.currentDrawable,
             let passDescriptor = view.currentRenderPassDescriptor
-        else { return }
+        else {
+            missingDrawables += 1
+            logFrame(view: view)
+            return
+        }
 
         let drawableSize = Vector2Int(
             x: Int(view.drawableSize.width.rounded()), y: Int(view.drawableSize.height.rounded()))
@@ -69,12 +75,25 @@ public final class GameRenderer: NSObject {
 
         commandBuffer.present(drawable)
         commandBuffer.commit()
+        logFrame(view: view)
 
         if let report {
             driver.reportFrame(
                 renderSize: report.renderSize, outputSize: report.outputSize,
                 usedMetalFX: report.usedMetalFX)
         }
+    }
+
+    private func logFrame(view: MTKView) {
+        #if DEBUG
+            frameCount += 1
+            guard frameCount % 120 == 0 else { return }
+            print(
+                "[arcade] frames=\(frameCount) missingDrawable=\(missingDrawables) "
+                    + "drawableSize=\(Int(view.drawableSize.width))x\(Int(view.drawableSize.height)) "
+                    + "bounds=\(Int(view.bounds.width))x\(Int(view.bounds.height)) "
+                    + "paused=\(view.isPaused) fps=\(view.preferredFramesPerSecond)")
+        #endif
     }
 
     private func elapsed() -> CFTimeInterval {

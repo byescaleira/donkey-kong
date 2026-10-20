@@ -8,6 +8,15 @@ struct KeyboardControls: ViewModifier {
     @State private var pressed: Set<GameKey> = []
 
     func body(content: Content) -> some View {
+        #if os(tvOS)
+            content
+        #else
+            keyboardAware(content)
+        #endif
+    }
+
+    #if !os(tvOS)
+    private func keyboardAware(_ content: Content) -> some View {
         content
             .focusable()
             .focusEffectDisabled()
@@ -18,6 +27,7 @@ struct KeyboardControls: ViewModifier {
                 handle(press, isDown: false)
             }
     }
+    #endif
 
     private func handle(_ press: KeyPress, isDown: Bool) -> KeyPress.Result {
         guard let key = GameKey(press: press) else { return .ignored }

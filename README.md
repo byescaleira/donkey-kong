@@ -1,7 +1,8 @@
 # Scrap Spire
 
-An original arcade climber for Apple platforms: **SwiftUI** shell, **SpriteKit** scene graph,
-**Metal** render pipeline with **MetalFX** upscaling to 4K, locked to a **60 Hz** simulation.
+An original arcade climber built for **Apple TV** first, and running unchanged on iOS, iPadOS and
+macOS: **SwiftUI** shell, **SpriteKit** scene graph, **Metal** render pipeline with **MetalFX**
+upscaling to 4K, locked to a **60 Hz** simulation.
 
 Climb the tower as Pip, a repair drone, while a malfunctioning cargo crane drops canisters down
 the girders. Grab the overclock chip to smash them. Reach the power core before the bonus runs out.
@@ -12,7 +13,7 @@ there are no third-party assets and no ROM is required.
 ## Running it
 
 ```bash
-scripts/build.sh          # package + macOS + iOS Simulator
+scripts/build.sh          # package + macOS + tvOS + iOS Simulator
 scripts/test.sh           # 63 tests
 scripts/run-mac.sh        # build and launch the Mac app
 scripts/shots.sh          # headless renders into docs/shots/
@@ -21,8 +22,39 @@ scripts/shots.sh          # headless renders into docs/shots/
 Open `ScrapSpire/ScrapSpire.xcodeproj` to run on a device. Regenerate the project with
 `cd ScrapSpire && xcodegen generate` after changing `project.yml`.
 
-Controls: arrows or WASD to move, space to jump, P or Esc to pause. On iOS there is an on-screen
-stick and jump button.
+Controls:
+
+| Platform | Move | Jump / start |
+| --- | --- | --- |
+| tvOS | Siri Remote touch surface or d-pad ring; any game controller | Click, or any face/shoulder button |
+| iOS | On-screen stick, or a paired controller | On-screen button, or any controller button |
+| macOS | Arrows or WASD, or a paired controller | Space; P or Esc pauses |
+
+Any controller button also inserts a credit on the title screen, so the Apple TV never needs a
+focused button to start a game.
+
+## Apple TV
+
+tvOS is the primary target and shapes three decisions:
+
+- **Input is GameController, not touch.** `GamepadInput` polls `GCController` every frame and feeds
+  the same `InputBuffer` the keyboard and the on-screen stick use, so the simulation never learns
+  where input came from. The Siri Remote arrives as a `microGamepad`, configured with absolute
+  d-pad values so touching a side of the surface means that direction. The decision logic — dead
+  zone, clamping, one jump per press rather than one per frame — lives in `GamepadMapping` in
+  `ArcadeCore` and is covered by tests, because a controller cannot be attached to a simulator.
+- **The focus engine must not fight the game.** On tvOS a focusable SwiftUI control steals the
+  remote's d-pad, so the settings button is hidden while a game is in progress and the only
+  focusable controls are the title and game-over menus.
+- **Overscan is just safe area.** `VirtualViewport` already fits the play area inside the safe
+  area, and tvOS reports overscan margins through exactly that, so a TV that crops the edges never
+  crops gameplay. `Slider` does not exist on tvOS, so the CRT controls fall back to a focusable
+  four-step picker.
+
+Verified on the Apple TV 4K simulator: the app renders at a native **3840×2160** with
+`missingDrawable=0` across 720 consecutive presented frames at 60 fps. MetalFX is absent from the
+tvOS *simulator* SDK (as it is from the iOS one) but present on the device SDK, so the simulator
+exercises the native-resolution fallback and real hardware takes the MetalFX path.
 
 ## How the three requirements are met
 

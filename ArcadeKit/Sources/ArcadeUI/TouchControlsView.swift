@@ -1,6 +1,8 @@
 import ArcadeCore
 import SwiftUI
 
+#if os(iOS)
+
 struct TouchControlsView: View {
     @Environment(GameSession.self) private var session
 
@@ -86,3 +88,4 @@ private struct JumpButton: View {
             .animation(.interactiveSpring(duration: 0.12), value: isPressed)
     }
 }
+#endif
