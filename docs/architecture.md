@@ -75,6 +75,26 @@ provando que o jogo apresentava 60 fps em 4K e que a captura é que estava em ca
 
 - **`SKRenderer` em vez de `SKView`.** É o único jeito de colocar SpriteKit dentro de um pipeline
   Metal próprio. Sem isso não há MetalFX nem post-processing.
+- **Nunca use `SKAction` nesta cena.** Elas não avançam no caminho do `SKRenderer`:
+  o `node.run(...)` executa, mas nada se move e um `.removeFromParent()` no fim da
+  sequência nunca dispara — o nó fica na cena para sempre. Foi assim que os popups
+  de pontuação se acumulavam na tela e sobreviviam à troca de fase, e foi por isso
+  que o prêmio e o chip ficaram congelados desde que nasceram.
+
+  **Toda animação é dirigida pelo relógio.** A `SpireScene` recebe o tempo do frame
+  em `sync(world:time:)`, calcula o delta e avança tudo à mão: `TransientEffect`
+  guarda origem, velocidade, duração e alfa inicial, e a cena move, desvanece e
+  remove. O prêmio e o chip usam o mesmo `elapsed`.
+
+  Três salvaguardas, porque o sintoma é visual e silencioso: a lista de efeitos tem
+  teto (`SpireScene.effectLimit`), trocar de fase chama `clearEffects()`, e delta
+  zero é no-op. Os testes em `ArcadeSceneTests` falham se um efeito sobreviver à sua
+  duração, se a lista crescer sem limite ou se algo sobreviver à troca de fase.
+
+  Isso é consequência direta de usar `SKRenderer` em vez de `SKView` — o preço de ter
+  MetalFX e post-processing. Vale para física do SpriteKit também: a simulação é a do
+  `ArcadeCore`, nunca a do SpriteKit.
+
 - **`scaleMode = .fill`.** `.resizeFill` faz o SpriteKit redimensionar a cena para o viewport, o que
   desalinha o mapeamento e faz o culling descartar o grafo inteiro (o sintoma foi um frame todo na
   cor de limpeza). Como a `VirtualViewport` garante que a área visível tem exatamente o aspecto da
