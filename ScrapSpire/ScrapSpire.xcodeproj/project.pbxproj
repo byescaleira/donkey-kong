@@ -149,7 +149,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				METAL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.byescaleira.scrapspire;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.byescaleira.donkey-kong";
 				PRODUCT_NAME = "Scrap Spire";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator appletvos appletvsimulator macosx";
@@ -254,7 +254,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				METAL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = com.byescaleira.scrapspire;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.byescaleira.donkey-kong";
 				PRODUCT_NAME = "Scrap Spire";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator appletvos appletvsimulator macosx";
