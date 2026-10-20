@@ -20,7 +20,6 @@ public struct PostUniforms {
 public enum MetalContextError: Error {
     case noDevice
     case noQueue
-    case noLibrary
     case noFunction(String)
 }
 
@@ -37,7 +36,7 @@ public final class MetalContext {
         guard let queue = device.makeCommandQueue() else { throw MetalContextError.noQueue }
         self.device = device
         commandQueue = queue
-        library = try device.makeDefaultLibrary(bundle: .module)
+        library = try device.makeLibrary(source: ShaderSource.metal, options: nil)
 
         let descriptor = MTLSamplerDescriptor()
         descriptor.minFilter = .linear

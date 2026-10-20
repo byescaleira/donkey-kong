@@ -1,3 +1,7 @@
+import Foundation
+
+enum ShaderSource {
+    static let metal = #"""
 #include <metal_stdlib>
 using namespace metal;
 
@@ -94,4 +98,6 @@ fragment float4 crt_fragment(QuadVertex in [[stage_in]],
     }
 
     return float4(color, 1.0);
+}
+"""#
 }

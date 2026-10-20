@@ -77,3 +77,21 @@ struct RenderSettingsTests {
         #expect(off.curvature == 0)
     }
 }
+
+@Suite("Shader library")
+struct ShaderLibraryTests {
+    @Test("the shader source compiles and exposes the post-process functions")
+    @MainActor
+    func shaderCompiles() throws {
+        let context = try MetalContext()
+        #expect(context.library.makeFunction(name: "fullscreen_vertex") != nil)
+        #expect(context.library.makeFunction(name: "crt_fragment") != nil)
+    }
+
+    @Test("the post-process pipeline builds for the drawable format")
+    @MainActor
+    func pipelineBuilds() throws {
+        let context = try MetalContext()
+        _ = try context.postPipeline(pixelFormat: GameRenderer.colorFormat)
+    }
+}
