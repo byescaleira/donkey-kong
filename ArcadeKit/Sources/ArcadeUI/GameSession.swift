@@ -28,13 +28,19 @@ public final class GameSession {
     @ObservationIgnored public let input = InputBuffer()
     @ObservationIgnored private let gamepad = GamepadInput()
     @ObservationIgnored public let audio = AudioDirector()
+    @ObservationIgnored public let haptics = HapticsDirector()
+    @ObservationIgnored private let highScores: any HighScoreStoring
     @ObservationIgnored private let spireScene: SpireScene
     @ObservationIgnored private var clock = GameClock()
     @ObservationIgnored private var frameTimes: [Double] = []
     @ObservationIgnored private var lastFrameTime: Double?
 
-    public init(settings: RenderSettings = RenderSettings()) {
-        world = GameWorld()
+    public init(
+        settings: RenderSettings = RenderSettings(),
+        highScores: any HighScoreStoring = UserDefaultsHighScore()
+    ) {
+        self.highScores = highScores
+        world = GameWorld(highScore: highScores.load())
         self.settings = settings
         spireScene = SpireScene(size: VirtualViewport.coreSize.cgSize)
     }
@@ -47,6 +53,7 @@ public final class GameSession {
 
     public func start() {
         audio.start()
+        haptics.prepare()
         world.startGame()
         clock.reset()
     }
@@ -61,6 +68,18 @@ public final class GameSession {
         set { audio.isEffectsEnabled = newValue }
     }
 
+    public var isHapticsEnabled: Bool {
+        get { haptics.isEnabled }
+        set { haptics.isEnabled = newValue }
+    }
+
+    public func applyReduceMotion(_ isReduced: Bool) {
+        guard isReduced else { return }
+        settings.crt.curvature = 0
+        settings.crt.aberration = 0
+        settings.crt.bloom = min(settings.crt.bloom, 0.15)
+    }
+
     public func togglePause() {
         isPaused.toggle()
         if !isPaused { clock.reset() }
@@ -68,6 +87,8 @@ public final class GameSession {
 
     private func handle(events: [GameEvent]) {
         audio.handle(events)
+        haptics.handle(events)
+        highScores.save(world.board.highScore)
         for event in events {
             switch event {
             case .scored(let points, let position):

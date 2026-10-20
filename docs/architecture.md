@@ -92,8 +92,9 @@ provando que o jogo apresentava 60 fps em 4K e que a captura é que estava em ca
 
 ## O que ainda não existe
 
-- Som e háptica (os eventos do mundo já existem e são o ponto de ligação).
-- Suporte a controle físico via `GameController`.
-- Persistência do recorde entre sessões.
+- Localização: os textos estão em inglês fixo no código, sem catálogo.
+- VoiceOver: só o botão de ajustes tem rótulo; Reduzir Movimento é respeitado,
+  leitura de tela não.
+- Menu de pausa de verdade (hoje é só uma faixa na tela).
 - `MTLFXTemporalScaler`, que renderiza ainda mais baixo com qualidade melhor, mas exige vetores de
   movimento e buffer de profundidade — a cena 2D teria que produzi-los.

@@ -101,60 +101,226 @@ public struct LevelLayout: Sendable {
         return best.map { (girder: $0.0, surfaceY: $0.1) }
     }
 
+    public var isTraversable: Bool {
+        var reached: Set<Int> = [bottomGirder.id]
+        var changed = true
+        while changed {
+            changed = false
+            for ladder in ladders where !ladder.isBroken {
+                guard let lower = girder(coveringX: ladder.centerX, atY: ladder.bottomY),
+                    let upper = girder(coveringX: ladder.centerX, atY: ladder.topY)
+                else { continue }
+                if reached.contains(lower.id), !reached.contains(upper.id) {
+                    reached.insert(upper.id)
+                    changed = true
+                }
+                if reached.contains(upper.id), !reached.contains(lower.id) {
+                    reached.insert(lower.id)
+                    changed = true
+                }
+            }
+        }
+        return reached.contains(topGirder.id)
+    }
+
+    public func girder(coveringX x: Double, atY y: Double) -> Girder? {
+        girders.first { girder in
+            guard let surface = girder.surfaceY(atX: x) else { return false }
+            return abs(surface - y) < 1.5
+        }
+    }
+
     public static func stage(_ stage: Int) -> LevelLayout {
-        let rows = 6
-        let baseY: Double = 22
-        let spacing: Double = 38
+        let style = StageStyle.allCases[(max(stage, 1) - 1) % StageStyle.allCases.count]
+        return make(stage: stage, style: style)
+    }
+
+    public static func make(stage: Int, style: StageStyle) -> LevelLayout {
         let width = VirtualViewport.coreSize.x
+        let specs = style.rows
+        let baseY: Double = 22
+        let spacing = style.spacing
+
         var girders: [Girder] = []
-        var ladders: [Ladder] = []
-
-        girders.append(Girder(id: 0, start: Vector2(x: 0, y: baseY), end: Vector2(x: width, y: baseY)))
-
-        for row in 1..<(rows - 1) {
-            let y = baseY + spacing * Double(row)
-            let descendsRight = row.isMultiple(of: 2)
-            let drop: Double = 10
-            let inset: Double = 12
-            let left = Vector2(x: descendsRight ? 0 : inset, y: descendsRight ? y + drop : y)
-            let right = Vector2(
-                x: descendsRight ? width - inset : width, y: descendsRight ? y : y + drop)
-            girders.append(Girder(id: row, start: left, end: right))
+        var identifier = 0
+        for (index, spec) in specs.enumerated() {
+            let y = baseY + spacing * Double(index)
+            for segment in spec.segments {
+                let start = Vector2(
+                    x: segment.lowerBound * width,
+                    y: y - spec.drop * (segment.lowerBound - 0.5))
+                let end = Vector2(
+                    x: segment.upperBound * width,
+                    y: y - spec.drop * (segment.upperBound - 0.5))
+                girders.append(Girder(id: identifier, start: start, end: end))
+                identifier += 1
+            }
         }
 
-        let topY = baseY + spacing * Double(rows - 1)
-        girders.append(
-            Girder(id: rows - 1, start: Vector2(x: 28, y: topY), end: Vector2(x: width - 28, y: topY)))
-
+        var ladders: [Ladder] = []
         var ladderID = 0
-        for row in 0..<(rows - 1) {
-            let lower = girders[row]
-            let upper = girders[row + 1]
-            let anchors: [Double] =
-                row.isMultiple(of: 2) ? [0.26, 0.72] : [0.34, 0.78]
+        for row in 0..<(specs.count - 1) {
+            let anchors = style.anchors(forRow: row)
             for (index, fraction) in anchors.enumerated() {
-                let span = min(lower.maxX, upper.maxX) - max(lower.minX, upper.minX)
-                guard span > Ladder.width * 2 else { continue }
-                let x = max(lower.minX, upper.minX) + span * fraction
-                guard let bottom = lower.surfaceY(atX: x), let top = upper.surfaceY(atX: x) else {
-                    continue
-                }
-                guard top - bottom > 12 else { continue }
-                let broken = stage > 1 && row > 0 && index == 1 && row.isMultiple(of: 2)
+                let x = fraction * width
+                let lower = girders.first { $0.minX <= x && x <= $0.maxX && isRow($0, row, baseY, spacing) }
+                let upper = girders.first { $0.minX <= x && x <= $0.maxX && isRow($0, row + 1, baseY, spacing) }
+                guard let lower, let upper,
+                    let bottom = lower.surfaceY(atX: x), let top = upper.surfaceY(atX: x),
+                    top - bottom > 14
+                else { continue }
+                let broken = style.breaksLadder(row: row, index: index, stage: stage)
                 ladders.append(
                     Ladder(id: ladderID, centerX: x, bottomY: bottom, topY: top, isBroken: broken))
                 ladderID += 1
             }
         }
 
-        let bonus = max(20, 46 - Double(stage - 1) * 4)
+        let topY = baseY + spacing * Double(specs.count - 1)
+        let bonus = max(18, style.bonusSeconds - Double(stage - 1) * 2)
+        let start = girders.first { isRow($0, 0, baseY, spacing) } ?? girders[0]
         return LevelLayout(
             stage: stage,
             girders: girders,
             ladders: ladders,
-            playerStart: Vector2(x: 24, y: baseY),
+            playerStart: Vector2(x: start.minX + 24, y: start.surfaceY(atX: start.minX + 24) ?? baseY),
             prizePosition: Vector2(x: width / 2 + 26, y: topY + 24),
             cranePosition: Vector2(x: width / 2 - 40, y: topY),
             bonusSeconds: bonus)
+    }
+
+    private static func isRow(_ girder: Girder, _ row: Int, _ baseY: Double, _ spacing: Double)
+        -> Bool
+    {
+        let expected = baseY + spacing * Double(row)
+        let mid = (girder.start.y + girder.end.y) / 2
+        return abs(mid - expected) < spacing / 2
+    }
+}
+
+public struct RowSpec: Sendable {
+    public let segments: [ClosedRange<Double>]
+    public let drop: Double
+
+    public init(segments: [ClosedRange<Double>], drop: Double = 0) {
+        self.segments = segments
+        self.drop = drop
+    }
+}
+
+public enum StageStyle: String, CaseIterable, Sendable {
+    case ascent
+    case zigzag
+    case towers
+    case split
+    case gauntlet
+
+    public var title: String {
+        switch self {
+        case .ascent: "Ascent"
+        case .zigzag: "Zigzag"
+        case .towers: "Towers"
+        case .split: "Split"
+        case .gauntlet: "Gauntlet"
+        }
+    }
+
+    public var spacing: Double {
+        switch self {
+        case .ascent: 38
+        case .zigzag: 34
+        case .towers: 38
+        case .split: 38
+        case .gauntlet: 30
+        }
+    }
+
+    public var bonusSeconds: Double {
+        switch self {
+        case .ascent: 46
+        case .zigzag: 48
+        case .towers: 44
+        case .split: 50
+        case .gauntlet: 54
+        }
+    }
+
+    public var rows: [RowSpec] {
+        switch self {
+        case .ascent:
+            [
+                RowSpec(segments: [0...1]),
+                RowSpec(segments: [0...0.95], drop: 11),
+                RowSpec(segments: [0.05...1], drop: -11),
+                RowSpec(segments: [0...0.95], drop: 11),
+                RowSpec(segments: [0.05...1], drop: -11),
+                RowSpec(segments: [0.12...0.88]),
+            ]
+        case .zigzag:
+            [
+                RowSpec(segments: [0...1]),
+                RowSpec(segments: [0...0.82], drop: 18),
+                RowSpec(segments: [0.18...1], drop: -18),
+                RowSpec(segments: [0...0.82], drop: 18),
+                RowSpec(segments: [0.18...1], drop: -18),
+                RowSpec(segments: [0...0.82], drop: 18),
+                RowSpec(segments: [0.12...0.88]),
+            ]
+        case .towers:
+            [
+                RowSpec(segments: [0...1]),
+                RowSpec(segments: [0...0.38, 0.62...1]),
+                RowSpec(segments: [0.1...0.46, 0.54...0.9]),
+                RowSpec(segments: [0...0.38, 0.62...1]),
+                RowSpec(segments: [0.1...0.46, 0.54...0.9]),
+                RowSpec(segments: [0.12...0.88]),
+            ]
+        case .split:
+            [
+                RowSpec(segments: [0...1]),
+                RowSpec(segments: [0...0.44, 0.56...1], drop: 9),
+                RowSpec(segments: [0...0.44, 0.56...1], drop: -9),
+                RowSpec(segments: [0...0.44, 0.56...1], drop: 9),
+                RowSpec(segments: [0...1], drop: -6),
+                RowSpec(segments: [0.12...0.88]),
+            ]
+        case .gauntlet:
+            [
+                RowSpec(segments: [0...1]),
+                RowSpec(segments: [0...0.9], drop: 10),
+                RowSpec(segments: [0.1...1], drop: -10),
+                RowSpec(segments: [0...0.9], drop: 10),
+                RowSpec(segments: [0.1...1], drop: -10),
+                RowSpec(segments: [0...0.9], drop: 10),
+                RowSpec(segments: [0.1...1], drop: -10),
+                RowSpec(segments: [0.12...0.88]),
+            ]
+        }
+    }
+
+    public func anchors(forRow row: Int) -> [Double] {
+        switch self {
+        case .ascent:
+            row.isMultiple(of: 2) ? [0.26, 0.72] : [0.34, 0.78]
+        case .zigzag:
+            row.isMultiple(of: 2) ? [0.2, 0.66] : [0.36, 0.8]
+        case .towers:
+            row.isMultiple(of: 2) ? [0.18, 0.82] : [0.3, 0.7]
+        case .split:
+            [0.18, 0.36, 0.64, 0.82]
+        case .gauntlet:
+            row.isMultiple(of: 2) ? [0.22, 0.52, 0.8] : [0.34, 0.66]
+        }
+    }
+
+    public func breaksLadder(row: Int, index: Int, stage: Int) -> Bool {
+        guard stage > 1, row > 0 else { return false }
+        switch self {
+        case .ascent: return index == 1 && row.isMultiple(of: 2)
+        case .zigzag: return index == 0 && !row.isMultiple(of: 2)
+        case .towers: return false
+        case .split: return index == 1 || index == 2
+        case .gauntlet: return index.isMultiple(of: 2) && row.isMultiple(of: 3)
+        }
     }
 }

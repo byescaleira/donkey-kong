@@ -46,6 +46,9 @@ public struct RenderSettingsView: View {
                 Section("Sound") {
                     Toggle("Music", isOn: $session.isMusicEnabled)
                     Toggle("Sound effects", isOn: $session.isEffectsEnabled)
+                    #if os(iOS)
+                        Toggle("Haptics", isOn: $session.isHapticsEnabled)
+                    #endif
                 }
 
                 Section("Cabinet look") {

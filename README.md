@@ -7,6 +7,11 @@ upscaling to 4K, locked to a **60 Hz** simulation.
 Climb the tower as Pip, a repair drone, while a malfunctioning cargo crane drops canisters down
 the girders. Grab the overclock chip to smash them. Reach the power core before the bonus runs out.
 
+Five stage layouts cycle as you climb — Ascent, Zigzag, Towers, Split and Gauntlet — each with its
+own girder shape, ladder placement and broken-ladder rule, getting faster and tighter on every
+pass. Music and every sound effect are synthesised in code from waveforms, so the repository
+ships no audio files either.
+
 Characters, art and theme are original and authored in this repository as pixel grids in code —
 there are no third-party assets and no ROM is required.
 

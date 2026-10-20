@@ -29,7 +29,7 @@ struct ArcadeShot {
             }
 
             var world = GameWorld(seed: arguments.seed)
-            world.startGame()
+            world.begin(stage: arguments.stage)
             let ticks = Int(arguments.seconds / GameClock.tickDuration)
             for _ in 0..<ticks {
                 world.step(dt: GameClock.tickDuration, input: arguments.input)
@@ -162,6 +162,7 @@ private struct Arguments {
     var frames = 1
     var iconLayer: IconLayer?
     var audioTrack: String?
+    var stage = 1
 
     init(_ arguments: [String]) {
         var index = 1
@@ -191,6 +192,9 @@ private struct Arguments {
             case "--no-crt":
                 crt = .off
                 index += 1
+            case "--stage":
+                stage = Int(value) ?? stage
+                index += 2
             case "--audio":
                 audioTrack = value
                 index += 2

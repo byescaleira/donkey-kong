@@ -4,6 +4,7 @@ import SwiftUI
 public struct GameShellView: View {
     @State private var session: GameSession
     @State private var isShowingSettings = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     public init(session: GameSession = GameSession()) {
         _session = State(initialValue: session)
@@ -24,6 +25,9 @@ public struct GameShellView: View {
         }
         .environment(session)
         .background(.black)
+        .onChange(of: reduceMotion, initial: true) { _, isReduced in
+            session.applyReduceMotion(isReduced)
+        }
         .keyboardControls(input: session.input) { session.togglePause() }
         .sheet(isPresented: $isShowingSettings) {
             RenderSettingsView().environment(session)

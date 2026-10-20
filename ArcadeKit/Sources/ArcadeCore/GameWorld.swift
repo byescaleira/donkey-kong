@@ -55,6 +55,11 @@ public struct GameWorld: Sendable {
         return events
     }
 
+    public mutating func begin(stage: Int) {
+        board = ScoreBoard(highScore: board.highScore, stage: stage)
+        loadStage(stage)
+    }
+
     public mutating func startGame() {
         board = ScoreBoard(highScore: board.highScore, stage: 1)
         loadStage(1)

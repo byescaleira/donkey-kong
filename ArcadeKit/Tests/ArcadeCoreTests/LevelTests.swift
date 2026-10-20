@@ -80,3 +80,77 @@ struct LevelTests {
         }
     }
 }
+
+@Suite("Stage variety")
+struct StageStyleTests {
+    @Test("every style produces a level that can be climbed to the top",
+          arguments: StageStyle.allCases)
+    func everyStyleIsTraversable(style: StageStyle) {
+        for stage in 1...6 {
+            let level = LevelLayout.make(stage: stage, style: style)
+            #expect(level.isTraversable, "\(style.title) stage \(stage) cannot be finished")
+        }
+    }
+
+    @Test("every stage of a long run can be finished")
+    func longRunStaysPlayable() {
+        for stage in 1...20 {
+            #expect(LevelLayout.stage(stage).isTraversable, "stage \(stage) cannot be finished")
+        }
+    }
+
+    @Test("consecutive stages do not repeat the same geometry")
+    func consecutiveStagesDiffer() {
+        let first = LevelLayout.stage(1)
+        let second = LevelLayout.stage(2)
+        let shapes = { (level: LevelLayout) in
+            level.girders.map { "\(Int($0.start.x)),\(Int($0.start.y)),\(Int($0.end.x)),\(Int($0.end.y))" }
+        }
+        #expect(shapes(first) != shapes(second))
+    }
+
+    @Test("the style cycle covers every style before repeating")
+    func cycleCoversEveryStyle() {
+        var seen: Set<String> = []
+        for stage in 1...StageStyle.allCases.count {
+            let shapes = LevelLayout.stage(stage).girders.count
+            seen.insert("\(stage)-\(shapes)")
+        }
+        #expect(seen.count == StageStyle.allCases.count)
+    }
+
+    @Test("every style has a reachable prize above its top girder",
+          arguments: StageStyle.allCases)
+    func prizeSitsAboveTheTop(style: StageStyle) {
+        let level = LevelLayout.make(stage: 1, style: style)
+        #expect(level.prizePosition.y > level.topGirder.start.y)
+        #expect(level.prizePosition.x >= 0)
+        #expect(level.prizePosition.x <= VirtualViewport.coreSize.x)
+    }
+
+    @Test("the player always starts standing on the bottom girder",
+          arguments: StageStyle.allCases)
+    func playerStartsGrounded(style: StageStyle) throws {
+        let level = LevelLayout.make(stage: 1, style: style)
+        let surface = try #require(level.bottomGirder.surfaceY(atX: level.playerStart.x))
+        #expect(abs(surface - level.playerStart.y) < 1)
+    }
+
+    @Test("every ladder joins two real girder surfaces", arguments: StageStyle.allCases)
+    func laddersJoinGirders(style: StageStyle) {
+        let level = LevelLayout.make(stage: 2, style: style)
+        #expect(!level.ladders.isEmpty)
+        for ladder in level.ladders {
+            #expect(level.girder(coveringX: ladder.centerX, atY: ladder.bottomY) != nil)
+            #expect(level.girder(coveringX: ladder.centerX, atY: ladder.topY) != nil)
+        }
+    }
+
+    @Test("later stages give less time than the first")
+    func laterStagesAreTighter() {
+        let early = LevelLayout.make(stage: 1, style: .ascent)
+        let late = LevelLayout.make(stage: 8, style: .ascent)
+        #expect(late.bonusSeconds < early.bonusSeconds)
+        #expect(late.bonusSeconds >= 18)
+    }
+}

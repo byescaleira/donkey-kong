@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 
 @testable import ArcadeCore
@@ -125,5 +126,59 @@ struct GameWorldTests {
         #expect(first.0 == second.0)
         #expect(first.1 == second.1)
         #expect(first.2 == second.2)
+    }
+}
+
+@Suite("High score persistence")
+struct HighScoreStoreTests {
+    @Test("a fresh store starts at zero")
+    func freshStoreIsEmpty() {
+        #expect(MemoryHighScore().load() == 0)
+    }
+
+    @Test("a better score is kept")
+    func betterScoreIsKept() {
+        let store = MemoryHighScore()
+        store.save(1_200)
+        #expect(store.load() == 1_200)
+    }
+
+    @Test("a worse score never overwrites the record")
+    func worseScoreIsIgnored() {
+        let store = MemoryHighScore(initial: 5_000)
+        store.save(900)
+        #expect(store.load() == 5_000)
+    }
+
+    @Test("the record carries into a new world")
+    func recordSeedsANewWorld() {
+        let store = MemoryHighScore(initial: 7_500)
+        var world = GameWorld(highScore: store.load())
+        world.startGame()
+        #expect(world.board.highScore == 7_500)
+        #expect(world.board.score == 0)
+    }
+
+    @Test("beating the record updates what would be saved")
+    func beatingTheRecordRaisesIt() {
+        var board = ScoreBoard(highScore: 400)
+        _ = board.add(900)
+        #expect(board.highScore == 900)
+        let store = MemoryHighScore(initial: 400)
+        store.save(board.highScore)
+        #expect(store.load() == 900)
+    }
+
+    @Test("the defaults-backed store round-trips through a suite")
+    func defaultsStoreRoundTrips() throws {
+        let name = "scrapspire.tests.\(UUID().uuidString)"
+        let defaults = try #require(UserDefaults(suiteName: name))
+        defer { defaults.removeSuite(named: name) }
+        let store = UserDefaultsHighScore(defaults: defaults)
+        #expect(store.load() == 0)
+        store.save(3_300)
+        #expect(store.load() == 3_300)
+        store.save(10)
+        #expect(store.load() == 3_300)
     }
 }
