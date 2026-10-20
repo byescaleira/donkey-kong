@@ -42,6 +42,15 @@ struct ArcadeShot {
                 spire.sync(world: world)
             }
 
+            if let spec = arguments.iconLayer {
+                guard let image = IconRenderer.render(
+                    width: arguments.size.x, height: arguments.size.y, layer: spec)
+                else { throw FrameGrabberError.noImage }
+                try IconRenderer.write(image, to: arguments.output)
+                print("wrote \(arguments.output.path) (\(arguments.size.x)x\(arguments.size.y), \(spec.rawValue))")
+                return
+            }
+
             if arguments.frames > 1 {
                 try probe(
                     grabber: grabber, scene: scene, arguments: arguments, world: world)
@@ -134,6 +143,7 @@ private struct Arguments {
     var input = InputState(horizontal: 1)
     var selfTest = false
     var frames = 1
+    var iconLayer: IconLayer?
 
     init(_ arguments: [String]) {
         var index = 1
@@ -163,6 +173,9 @@ private struct Arguments {
             case "--no-crt":
                 crt = .off
                 index += 1
+            case "--layer":
+                iconLayer = IconLayer(rawValue: value)
+                index += 2
             case "--frames":
                 frames = Int(value) ?? frames
                 index += 2

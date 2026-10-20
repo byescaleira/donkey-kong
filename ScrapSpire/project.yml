@@ -49,6 +49,8 @@ targets:
         ENABLE_PREVIEWS: YES
         METAL_FAST_MATH: YES
         ASSETCATALOG_COMPILER_APPICON_NAME: ScrapSpireIcon
+        ASSETCATALOG_COMPILER_APPICON_NAME[sdk=appletvos*]: App Icon & Top Shelf Image
+        ASSETCATALOG_COMPILER_APPICON_NAME[sdk=appletvsimulator*]: App Icon & Top Shelf Image
 
 schemes:
   ScrapSpire:
