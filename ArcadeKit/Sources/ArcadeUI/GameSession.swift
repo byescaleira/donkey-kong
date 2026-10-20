@@ -126,7 +126,7 @@ extension GameSession: FrameDriver {
 
         guard !isPaused else {
             clock.reset()
-            spireScene.sync(world: world)
+            spireScene.sync(world: world, time: time)
             return
         }
 
@@ -145,7 +145,7 @@ extension GameSession: FrameDriver {
             handle(events: world.drainEvents())
         }
         audio.update(phase: world.phase)
-        spireScene.sync(world: world)
+        spireScene.sync(world: world, time: time)
     }
 
     public func reportFrame(renderSize: Vector2Int, outputSize: Vector2Int, usedMetalFX: Bool) {

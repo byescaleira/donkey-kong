@@ -40,7 +40,7 @@ struct ArcadeShot {
                 pointSize: Vector2(x: Double(arguments.size.x), y: Double(arguments.size.y)))
             if let spire = scene as? SpireScene {
                 spire.apply(viewport: viewport)
-                spire.sync(world: world)
+                spire.sync(world: world, time: arguments.seconds)
             }
 
             if let track = arguments.audioTrack {

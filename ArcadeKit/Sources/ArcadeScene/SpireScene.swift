@@ -13,8 +13,12 @@ public final class SpireScene: SKScene {
     private var pickupNode: SKSpriteNode?
     private var prizeNode: SKSpriteNode?
     private var craneNode: CraneNode?
+    private var prizeOrigin: CGPoint = .zero
 
     private let sceneryLayer = SKNode()
+    private var effects: [TransientEffect] = []
+    private var lastTime: Double?
+    private var elapsed: Double = 0
     private var viewport: VirtualViewport?
     private var structureKey: String?
     private var currentLevel: LevelLayout?
@@ -48,11 +52,60 @@ public final class SpireScene: SKScene {
         }
     }
 
+    public func sync(world: GameWorld, time: Double) {
+        advance(to: time)
+        sync(world: world)
+    }
+
+    public func advance(to time: Double) {
+        defer { lastTime = time }
+        guard let lastTime else { return }
+        advance(dt: max(time - lastTime, 0))
+    }
+
+    public func advance(dt: Double) {
+        guard dt > 0 else { return }
+        elapsed += dt
+        var survivors: [TransientEffect] = []
+        survivors.reserveCapacity(effects.count)
+        for var effect in effects {
+            effect.elapsed += dt
+            guard effect.elapsed < effect.duration else {
+                effect.node.removeFromParent()
+                continue
+            }
+            let progress = effect.elapsed / effect.duration
+            effect.node.position = CGPoint(
+                x: effect.origin.x + effect.velocity.dx * effect.elapsed,
+                y: effect.origin.y + effect.velocity.dy * effect.elapsed)
+            effect.node.alpha = effect.startAlpha * CGFloat(1 - progress)
+            if effect.growth != 0 {
+                effect.node.setScale(1 + effect.growth * CGFloat(progress))
+            }
+            survivors.append(effect)
+        }
+        effects = survivors
+        animateIdleNodes()
+    }
+
+    private func animateIdleNodes() {
+        prizeNode?.position = CGPoint(
+            x: prizeOrigin.x, y: prizeOrigin.y + sin(elapsed * 1.8) * 2)
+        pickupNode?.alpha = 0.6 + 0.4 * (0.5 + 0.5 * sin(elapsed * 4))
+    }
+
+    private func clearEffects() {
+        for effect in effects { effect.node.removeFromParent() }
+        effects.removeAll(keepingCapacity: true)
+        effectLayer.removeAllChildren()
+    }
+
     public func sync(world: GameWorld) {
         let key = "\(world.level.stage)-\(world.level.girders.count)-\(world.level.ladders.count)"
         if structureKey != key {
             structureKey = key
             currentLevel = world.level
+            clearEffects()
             rebuildStructure(level: world.level)
             if let viewport {
                 rebuildScenery(viewport: viewport, level: world.level)
@@ -64,6 +117,8 @@ public final class SpireScene: SKScene {
         craneNode?.update(time: world.climber.animationTime, isActive: world.phase.isInteractive)
     }
 
+    public var activeEffectCount: Int { effectLayer.children.count }
+
     public func emitScorePopup(points: Int, at position: Vector2) {
         let label = SKLabelNode(text: "\(points)")
         label.fontName = "Menlo-Bold"
@@ -72,11 +127,7 @@ public final class SpireScene: SKScene {
         label.position = CGPoint(x: position.x, y: position.y + 18)
         label.zPosition = 50
         effectLayer.addChild(label)
-        label.run(
-            .sequence([
-                .group([.moveBy(x: 0, y: 16, duration: 0.7), .fadeOut(withDuration: 0.7)]),
-                .removeFromParent(),
-            ]))
+        register(label, velocity: CGVector(dx: 0, dy: 23), duration: 0.7)
     }
 
     public func emitBurst(at position: Vector2, color: PixelColor) {
@@ -86,15 +137,23 @@ public final class SpireScene: SKScene {
             shard.zPosition = 45
             effectLayer.addChild(shard)
             let angle = Double(index) / 8 * .pi * 2
-            shard.run(
-                .sequence([
-                    .group([
-                        .moveBy(x: cos(angle) * 16, y: sin(angle) * 16 + 6, duration: 0.4),
-                        .fadeOut(withDuration: 0.4),
-                    ]),
-                    .removeFromParent(),
-                ]))
+            register(
+                shard,
+                velocity: CGVector(dx: cos(angle) * 40, dy: sin(angle) * 40 + 15),
+                duration: 0.4)
         }
+    }
+
+    private func register(
+        _ node: SKNode, velocity: CGVector, duration: Double, growth: CGFloat = 0
+    ) {
+        if effects.count >= SpireScene.effectLimit, !effects.isEmpty {
+            effects.removeFirst().node.removeFromParent()
+        }
+        effects.append(
+            TransientEffect(
+                node: node, origin: node.position, velocity: velocity, duration: duration,
+                startAlpha: node.alpha, growth: growth))
     }
 
     private func rebuildBackground(viewport: VirtualViewport) {
@@ -168,11 +227,9 @@ public final class SpireScene: SKScene {
         let prize = SKSpriteNode(texture: TextureFactory.shared.texture(.core))
         prize.position = level.prizePosition.cgPoint
         prize.zPosition = 10
-        prize.run(
-            .repeatForever(
-                .sequence([.moveBy(x: 0, y: 2, duration: 0.9), .moveBy(x: 0, y: -2, duration: 0.9)])))
         structureLayer.addChild(prize)
         prizeNode = prize
+        prizeOrigin = prize.position
 
         let crane = CraneNode()
         crane.position = level.cranePosition.cgPoint
@@ -258,13 +315,34 @@ public final class SpireScene: SKScene {
     private func makePickupNode() -> SKSpriteNode {
         let node = SKSpriteNode(texture: TextureFactory.shared.texture(.chip))
         node.zPosition = 20
-        node.run(
-            .repeatForever(
-                .sequence([
-                    .fadeAlpha(to: 0.6, duration: 0.5), .fadeAlpha(to: 1, duration: 0.5),
-                ])))
         actorLayer.addChild(node)
         pickupNode = node
         return node
     }
+}
+
+private struct TransientEffect {
+    let node: SKNode
+    let origin: CGPoint
+    let velocity: CGVector
+    let duration: Double
+    var elapsed: Double = 0
+    let startAlpha: CGFloat
+    let growth: CGFloat
+
+    init(
+        node: SKNode, origin: CGPoint, velocity: CGVector, duration: Double,
+        startAlpha: CGFloat, growth: CGFloat
+    ) {
+        self.node = node
+        self.origin = origin
+        self.velocity = velocity
+        self.duration = duration
+        self.startAlpha = startAlpha
+        self.growth = growth
+    }
+}
+
+extension SpireScene {
+    static let effectLimit = 48
 }

@@ -23,6 +23,7 @@ let package = Package(
             dependencies: ["ArcadeCore", "ArcadeAudio", "ArcadeScene", "ArcadeRender"]),
         .testTarget(name: "ArcadeCoreTests", dependencies: ["ArcadeCore"]),
         .testTarget(name: "ArcadeAudioTests", dependencies: ["ArcadeCore", "ArcadeAudio"]),
+        .testTarget(name: "ArcadeSceneTests", dependencies: ["ArcadeCore", "ArcadeScene"]),
         .testTarget(name: "ArcadeRenderTests", dependencies: ["ArcadeCore", "ArcadeRender"]),
     ]
 )
