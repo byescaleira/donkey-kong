@@ -1,0 +1,8 @@
+.DS_Store
+.build/
+ArcadeKit/.build/
+DerivedData/
+*.xcuserdatastate
+xcuserdata/
+*.xcscmblueprint
+*.xccheckout
