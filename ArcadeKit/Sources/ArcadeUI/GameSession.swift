@@ -1,3 +1,4 @@
+import ArcadeAudio
 import ArcadeCore
 import ArcadeRender
 import ArcadeScene
@@ -26,6 +27,7 @@ public final class GameSession {
 
     @ObservationIgnored public let input = InputBuffer()
     @ObservationIgnored private let gamepad = GamepadInput()
+    @ObservationIgnored public let audio = AudioDirector()
     @ObservationIgnored private let spireScene: SpireScene
     @ObservationIgnored private var clock = GameClock()
     @ObservationIgnored private var frameTimes: [Double] = []
@@ -44,8 +46,19 @@ public final class GameSession {
     public var phase: GamePhase { world.phase }
 
     public func start() {
+        audio.start()
         world.startGame()
         clock.reset()
+    }
+
+    public var isMusicEnabled: Bool {
+        get { audio.isMusicEnabled }
+        set { audio.isMusicEnabled = newValue }
+    }
+
+    public var isEffectsEnabled: Bool {
+        get { audio.isEffectsEnabled }
+        set { audio.isEffectsEnabled = newValue }
     }
 
     public func togglePause() {
@@ -54,6 +67,7 @@ public final class GameSession {
     }
 
     private func handle(events: [GameEvent]) {
+        audio.handle(events)
         for event in events {
             switch event {
             case .scored(let points, let position):
@@ -109,6 +123,7 @@ extension GameSession: FrameDriver {
             }
             handle(events: world.drainEvents())
         }
+        audio.update(phase: world.phase)
         spireScene.sync(world: world)
     }
 

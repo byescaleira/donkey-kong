@@ -12,12 +12,17 @@ let package = Package(
     ],
     targets: [
         .target(name: "ArcadeCore"),
+        .target(name: "ArcadeAudio", dependencies: ["ArcadeCore"]),
         .target(name: "ArcadeScene", dependencies: ["ArcadeCore"]),
         .target(name: "ArcadeRender", dependencies: ["ArcadeCore", "ArcadeScene"]),
-        .target(name: "ArcadeUI", dependencies: ["ArcadeCore", "ArcadeScene", "ArcadeRender"]),
+        .target(
+            name: "ArcadeUI",
+            dependencies: ["ArcadeCore", "ArcadeAudio", "ArcadeScene", "ArcadeRender"]),
         .executableTarget(
-            name: "ArcadeShot", dependencies: ["ArcadeCore", "ArcadeScene", "ArcadeRender"]),
+            name: "ArcadeShot",
+            dependencies: ["ArcadeCore", "ArcadeAudio", "ArcadeScene", "ArcadeRender"]),
         .testTarget(name: "ArcadeCoreTests", dependencies: ["ArcadeCore"]),
+        .testTarget(name: "ArcadeAudioTests", dependencies: ["ArcadeCore", "ArcadeAudio"]),
         .testTarget(name: "ArcadeRenderTests", dependencies: ["ArcadeCore", "ArcadeRender"]),
     ]
 )

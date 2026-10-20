@@ -1,3 +1,4 @@
+import ArcadeAudio
 import ArcadeCore
 import ArcadeRender
 import ArcadeScene
@@ -40,6 +41,22 @@ struct ArcadeShot {
             if let spire = scene as? SpireScene {
                 spire.apply(viewport: viewport)
                 spire.sync(world: world)
+            }
+
+            if let track = arguments.audioTrack {
+                let samples = AudioExport.render(track)
+                guard !samples.isEmpty else {
+                    FileHandle.standardError.write(Data("unknown track \(track)\n".utf8))
+                    exit(1)
+                }
+                let data = AudioExport.wav(from: samples, sampleRate: Synthesizer.sampleRate)
+                try data.write(to: arguments.output)
+                let seconds = Double(samples.count) / Synthesizer.sampleRate
+                print("wrote \(arguments.output.path)")
+                print("  track    \(track)")
+                print("  duration \(String(format: "%.2f", seconds))s")
+                print("  peak     \(String(format: "%.3f", AudioExport.peak(samples)))")
+                return
             }
 
             if let spec = arguments.iconLayer {
@@ -144,6 +161,7 @@ private struct Arguments {
     var selfTest = false
     var frames = 1
     var iconLayer: IconLayer?
+    var audioTrack: String?
 
     init(_ arguments: [String]) {
         var index = 1
@@ -173,6 +191,9 @@ private struct Arguments {
             case "--no-crt":
                 crt = .off
                 index += 1
+            case "--audio":
+                audioTrack = value
+                index += 2
             case "--layer":
                 iconLayer = IconLayer(rawValue: value)
                 index += 2

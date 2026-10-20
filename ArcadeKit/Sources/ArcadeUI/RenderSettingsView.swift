@@ -43,6 +43,11 @@ public struct RenderSettingsView: View {
                     }
                 }
 
+                Section("Sound") {
+                    Toggle("Music", isOn: $session.isMusicEnabled)
+                    Toggle("Sound effects", isOn: $session.isEffectsEnabled)
+                }
+
                 Section("Cabinet look") {
                     Toggle("CRT effects", isOn: $session.settings.crt.isEnabled)
                     if session.settings.crt.isEnabled {
